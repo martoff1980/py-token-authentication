@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, BasePermission, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from .permissions import IsAdminOrIfAuthenticatedReadOnly
 
@@ -47,11 +47,12 @@ class ActorViewSet(
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_permissions(self):
         if self.action == "create":
             return [IsAdminUser()]
         return [IsAuthenticated()]
+
 
 class CinemaHallViewSet(
     mixins.ListModelMixin,
@@ -66,6 +67,7 @@ class CinemaHallViewSet(
         if self.action == "create":
             return [IsAdminUser()]
         return [IsAuthenticated()]
+
 
 class MovieViewSet(
     mixins.ListModelMixin,
@@ -155,7 +157,7 @@ class MovieSessionViewSet(
             return MovieSessionDetailSerializer
 
         return MovieSessionSerializer
-    
+
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return [IsAdminUser()]
@@ -170,13 +172,13 @@ class OrderPagination(PageNumberPagination):
 class OrderViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    viewsets.GenericViewSet
-):    
+    viewsets.GenericViewSet,
+):
     queryset = Order.objects.all()
 
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
